@@ -39,6 +39,7 @@ public class ToneDialog extends Activity {
     ToneSettings settings = null;
     TonePlayer player = null;
     Vibrator mVibrator = null;
+    boolean mIsResponseSent = false;
 
     /**
      * Handler used to stop tones from playing when the duration ends.
@@ -100,8 +101,9 @@ public class ToneDialog extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        mToneStopper.removeMessages(MSG_ID_STOP_TONE);
+        if (mIsResponseSent) {
+            mToneStopper.removeMessages(MSG_ID_STOP_TONE);
+        }
         player.stop();
         player.release();
         mVibrator.cancel();
@@ -131,5 +133,6 @@ public class ToneDialog extends Activity {
         args.putInt(StkAppService.OPCODE, StkAppService.OP_RESPONSE);
         args.putInt(StkAppService.RES_ID, resId);
         startService(new Intent(this, StkAppService.class).putExtras(args));
+        mIsResponseSent = true;
     }
 }
